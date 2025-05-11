@@ -1,0 +1,14 @@
+lock:
+  li t0, 0x1000        # Lock variable address
+  li t1, 1             # 1 = locked
+
+try_again:
+  amoswap.w t2, t1, (t0)  # Atomically swap 1 into memory, get old value in t2
+  bnez t2, try_again      # If lock already held, retry
+  ret
+
+unlock:
+  li t0, 0x1000
+  li t1, 0             # 0 = unlocked
+  amoswap.w zero, t1, (t0)  # Atomically release lock
+  ret
